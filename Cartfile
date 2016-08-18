@@ -1,6 +1,6 @@
 github "Alamofire/Alamofire" "1dc3992a3854ca369368c8997ea3c45054070e67"
 github "mxcl/PromiseKit" "7743792ca36a76aee8c02b155c92f441f838eaa2"
-github "JackieQi/Locksmith" "swift-3.0"
+github "JackieQi/Locksmith" "659df47470ca42fce74836c8bfb21dcba1ce28fd"
 
 
 
