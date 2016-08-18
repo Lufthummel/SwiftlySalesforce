@@ -17,7 +17,6 @@
 		B2695F141D6336EF00493443 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2695F0C1D6336EF00493443 /* Credentials.swift */; };
 		B2695F151D6336EF00493443 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2695F0D1D6336EF00493443 /* Error.swift */; };
 		B2695F161D6336EF00493443 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2695F0E1D6336EF00493443 /* Extensions.swift */; };
-		B2695F171D6336EF00493443 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B2695F0F1D6336EF00493443 /* Info.plist */; };
 		B2695F181D6336EF00493443 /* OAuth2Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2695F101D6336EF00493443 /* OAuth2Manager.swift */; };
 		B2695F191D6336EF00493443 /* SalesforceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2695F111D6336EF00493443 /* SalesforceAPI.swift */; };
 		B2695F1A1D6336EF00493443 /* SwiftlySalesforce.h in Headers */ = {isa = PBXBuildFile; fileRef = B2695F121D6336EF00493443 /* SwiftlySalesforce.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -189,11 +188,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Holger Kremmin";
 				TargetAttributes = {
 					B274ECA31D6314C800612689 = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0800;
 					};
 					B274ECAD1D6314C800612689 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -223,7 +223,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2695F171D6336EF00493443 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,8 +281,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -331,8 +332,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -352,6 +355,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -363,6 +367,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -376,6 +381,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -383,6 +389,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -395,6 +402,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.salesforce.SwiftlySalesforce;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

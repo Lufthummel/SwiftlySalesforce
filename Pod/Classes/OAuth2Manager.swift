@@ -12,27 +12,28 @@ import PromiseKit
 import Alamofire
 
 
-public class OAuth2Manager {
+open class OAuth2Manager {
 	
 
 	
-	public static let sharedInstance = OAuth2Manager() // Singleton
+	open static let sharedInstance = OAuth2Manager() // Singleton
 	
-	public var consumerKey: String? // From Connected App settings
-	public var redirectURL: NSURL?  // From Connected App settings, the "Callback URL"
+	open var consumerKey: String? // From Connected App settings
+	open var redirectURL: URL?  // From Connected App settings, the "Callback URL"
 	
-	public var hostname: String = "login.salesforce.com" // Host for OAuth2 authorization and authentication
-	public weak var authenticationDelegate: AuthenticationDelegate?
+	open var hostname: String = "login.salesforce.com" // Host for OAuth2 authorization and authentication
+	open weak var authenticationDelegate: AuthenticationDelegate?
 	
-	internal var pendingAuthorization: (promise: Promise<Credentials>, fulfill: (Credentials) -> (), reject: (ErrorType) -> ())?
+	internal var pendingAuthorization: (promise: Promise<Credentials>, fulfill: (Credentials) -> (), reject: (Error) -> ())?
 	internal var promisedRevocation: Promise<Void>?
 	
 	
 	
 	/// Local credentials store. Uses iOS Keychain. Read only.
-	public var credentials: Credentials? {
+	open var credentials: Credentials? {
 		get {
-			guard let dict = Locksmith.loadDataForUserAccount(Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue) else {
+
+			guard let dict = Locksmith.loadData(for: Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue) else {
 				return nil
 			}
 			let creds = Credentials(dictionary: dict)
@@ -41,12 +42,12 @@ public class OAuth2Manager {
 	}
 	
 	/// URL to use for user login
-	public var authorizationURL: NSURL? {
+	open var authorizationURL: URL? {
 		
 		guard let
 			redirectURLString = self.redirectURL?.absoluteString,
-			consumerKey = self.consumerKey,
-			comps = NSURLComponents(string: "https://\(hostname)/services/oauth2/authorize") else {
+			let consumerKey = self.consumerKey,
+			var comps = URLComponents(string: "https://\(hostname)/services/oauth2/authorize") else {
 			return nil
 		}
 		
@@ -56,13 +57,13 @@ public class OAuth2Manager {
 			"redirect_uri" : redirectURLString,
 			"prompt" : "login consent",
 			"display" : "touch"])
-		return comps.URL
+		return comps.url
 	}
 	
 	
 	
 	/// Private initializer
-	private init() { }
+	fileprivate init() { }
 	
 	
 	
@@ -70,7 +71,7 @@ public class OAuth2Manager {
 	/// - Parameter consumerKey: "Consumer Key" from Salesforce Connected App settings
 	/// - Parameter callbackURL: "Callback URL" from Salesforce Connected App settings
 	/// - Parameter hostname: authorization hostname; login.salesforce.com, or test.salesforce.com (sandbox), or custom 'my domain' host
-	public func configureWithConsumerKey(consumerKey: String, redirectURL: NSURL, hostname: String = "login.salesforce.com") {
+	open func configureWithConsumerKey(_ consumerKey: String, redirectURL: URL, hostname: String = "login.salesforce.com") {
 		self.consumerKey = consumerKey
 		self.redirectURL = redirectURL
 		self.hostname = hostname
@@ -79,14 +80,14 @@ public class OAuth2Manager {
 	/// Retrieve credentials for current user, including access token required in HTTP request header.
 	/// First tries to use refresh token, if there is one, but if that fails, user has to log in
 	/// - Returns: Promise of Credentials
-	public func authorize() -> Promise<Credentials> {
+	open func authorize() -> Promise<Credentials> {
 		
-		if let pending = self.pendingAuthorization where pending.promise.pending {
+		if let pending = self.pendingAuthorization , pending.promise.pending   {
 			return pending.promise
 		}
 		else {
 			
-			let pending = Promise<Credentials>.pendingPromise()
+			let pending = Promise<Credentials>.pending()
 			self.pendingAuthorization = pending
 			
 			if let refreshToken = self.credentials?.refreshToken {
@@ -96,7 +97,7 @@ public class OAuth2Manager {
 				}.then {
 					(credentials) -> () in
 					pending.fulfill(credentials)
-				}.error {
+				}.catch {
 					(_) -> () in
 					do { try self.delegateAuthentication() }
 					catch {	pending.reject(error) }
@@ -114,9 +115,9 @@ public class OAuth2Manager {
 	/// Revokes the stored refresh token or, if the refresh token is not available, then revokes the stored access token.
 	/// Salesforce revokes an associated access token, too, when revoking the refresh token.
 	/// - Returns: Promise of an NSURL that can be used to clear the user's UI session and complete a client-side logout process
-	public func revoke() -> Promise<Void> {
+	open func revoke() -> Promise<Void> {
 	
-		if let promise = self.promisedRevocation where promise.pending {
+		if let promise = self.promisedRevocation , promise.pending    {
 			return promise
 		}
 		else {
@@ -126,13 +127,13 @@ public class OAuth2Manager {
 				fulfill, reject in
 				
 				guard let token = self.credentials?.refreshToken ?? self.credentials?.accessToken else {
-					reject(Error.InvalidState(message: "No token to revoke"))
+					reject(SFError.invalidState(message: "No token to revoke"))
 					return
 				}
 				
 				let URLString = "https://\(self.hostname)/services/oauth2/revoke"
 				let params = [ "token": token]
-				Alamofire.request(.GET, URLString, parameters: params, encoding: .URL, headers: nil)
+				Alamofire.request(URLString, withMethod: .get, parameters: params, encoding: .URL, headers: nil)
 					.validate()
 					.responseData {
 						(response) -> () in
@@ -158,24 +159,24 @@ public class OAuth2Manager {
 	
 	
 	/// Authentication delegate should call this when authentication has completed
-	public func authenticationCompletedWithResult(result: AuthenticationResult) {
+	open func authenticationCompletedWithResult(_ result: AuthenticationResult) {
 		
 		switch result {
 		
-		case .Success(let credentials):
+		case .success(let credentials):
 			do {
 				try storeCredentials(credentials)
-				if let pending = pendingAuthorization where pending.promise.pending {
+				if let pending = pendingAuthorization , pending.promise.pending {
 					pending.fulfill(credentials)
 				}
 			}
 			catch {
-				if let pending = pendingAuthorization where pending.promise.pending {
-					pending.reject(error)
+				if let pending = pendingAuthorization , pending.promise.pending {
+					pending.reject(error as! SFError)
 				}
 			}
-		case .Failure(let error):
-			if let pending = pendingAuthorization where pending.promise.pending {
+		case .failure(let error):
+			if let pending = pendingAuthorization , pending.promise.pending {
 				pending.reject(error)
 			}
 		}
@@ -186,10 +187,10 @@ public class OAuth2Manager {
 	// MARK: - Internal functions
 	//
 	
-	internal func refreshCredentialsWithToken(refreshToken: String) throws -> Promise<Credentials> {
+	internal func refreshCredentialsWithToken(_ refreshToken: String) throws -> Promise<Credentials> {
 		
 		guard let consumerKey = self.consumerKey else {
-			throw Error.InvalidState(message: "Consumer key not specified")
+			throw SFError.invalidState(message: "Consumer key not specified")
 		}
 		
 		// TODO: use non-caching URL session to prevent storage of redirect URLs, which may contain
@@ -204,8 +205,8 @@ public class OAuth2Manager {
 		return Promise {
 			
 			fulfill, reject in
-			
-			Alamofire.request(.POST, URLString, parameters: params, encoding: .URL, headers: nil)
+			Alamofire.request
+            Alamofire.request(URLString, withMethod: .post, parameters: params, encoding: .URL, headers: nil)
 			.responseString {
 				(response) -> () in
 				switch response.result {
@@ -235,14 +236,14 @@ public class OAuth2Manager {
 		}
 	}
 	
-	internal func storeCredentials(credentials: Credentials) throws {
-		try Locksmith.updateData(credentials.toDictionary(), forUserAccount: Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue)
+	internal func storeCredentials(_ credentials: Credentials) throws {
+		try Locksmith.updateData(credentials.toDictionary() as [String : AnyObject], forUserAccount: Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue)
 	}
 	
 	internal func clearCredentials() throws {
 		
 		do {
-			try Locksmith.deleteDataForUserAccount(Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue)
+			try Locksmith.deleteData(for: Constant.CurrentUser.rawValue, inService: Constant.Salesforce.rawValue)
 		}
 		catch {
 			// Ignore error if credentials aren't already in the keychain
@@ -255,10 +256,10 @@ public class OAuth2Manager {
 	internal func delegateAuthentication() throws {
 		
 		guard let authenticationDelegate = self.authenticationDelegate else {
-			throw Error.InvalidState(message: "Invalid authentication delegate")
+			throw SFError.invalidState(message: "Invalid authentication delegate")
 		}
 		guard let authorizationURL = self.authorizationURL else {
-			throw Error.InvalidState(message: "Invalid configuration; verify that consumer key and callback URL have been set.")
+			throw SFError.invalidState(message: "Invalid configuration; verify that consumer key and callback URL have been set.")
 		}
 		
 		try authenticationDelegate.authenticateWithURL(authorizationURL)

@@ -1,3 +1,3 @@
-github "Alamofire/Alamofire" "3.4.1"
-github "matthewpalmer/Locksmith" "2.0.8"
-github "mxcl/PromiseKit" "3.5.0"
+github "Alamofire/Alamofire" "1dc3992a3854ca369368c8997ea3c45054070e67"
+github "JeromeTan1997/Locksmith" "42b67b2f62fec59f86a44e572d16ebadd04983e8"
+github "mxcl/PromiseKit" "7743792ca36a76aee8c02b155c92f441f838eaa2"
