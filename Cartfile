@@ -1,4 +1,4 @@
-github "Alamofire/Alamofire" "1dc3992a3854ca369368c8997ea3c45054070e67"
+github "Alamofire/Alamofire" "swift3"
 github "mxcl/PromiseKit" "swift-3.0"
 github "matthewpalmer/Locksmith" "swift-3.0"
 
