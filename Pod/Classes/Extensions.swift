@@ -82,14 +82,28 @@ extension DateFormatter {
 
 // MARK: - Extension
 extension String {
-	
+    
+    /*
+	//adapted from http://stackoverflow.com/questions/26306326/swift-apply-uppercasestring-to-only-the-first-letter-of-a-string
+    var first: String {
+        return String(characters.prefix(1))
+    }
+    var last: String {
+        return String(characters.suffix(1))
+    }
+    var sentenceCapitalizedString: String {
+        return first.uppercased + String(characters.dropFirst())
+    }
+    */
+    
+    
 	public var sentenceCapitalizedString: String {
-		get {
-			var s = String(self)
-            s?.replacingCharacters(in: Range<Index>(uncheckedBounds: (lower: (s?.startIndex)!, upper: (s?.startIndex)!)), with: String((s?[(s?.startIndex)!])!).capitalized)
-			return s!
-		}
+        let first = String(characters.prefix(1)).capitalized
+        let other = String(characters.dropFirst())
+        return first + other
+        
 	}
+    
 }
 
 
@@ -101,7 +115,7 @@ extension URL {
 		guard let s = URLString else {
 			return nil
 		}
-		(self as NSURL).init(string: s)
+        self.init(string: s)
 	}
 	
 	/// Adapted from http://stackoverflow.com/questions/3997976/parse-nsurl-query-property

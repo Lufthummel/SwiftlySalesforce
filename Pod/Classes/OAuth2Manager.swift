@@ -82,7 +82,7 @@ open class OAuth2Manager {
 	/// - Returns: Promise of Credentials
 	open func authorize() -> Promise<Credentials> {
 		
-		if let pending = self.pendingAuthorization , pending.promise.pending   {
+		if let pending = self.pendingAuthorization , let _ = self.pendingAuthorization?.promise   {
 			return pending.promise
 		}
 		else {
@@ -117,7 +117,7 @@ open class OAuth2Manager {
 	/// - Returns: Promise of an NSURL that can be used to clear the user's UI session and complete a client-side logout process
 	open func revoke() -> Promise<Void> {
 	
-		if let promise = self.promisedRevocation , promise.pending    {
+		if let promise = self.promisedRevocation , let _ = self.promisedRevocation?.isPending    {
 			return promise
 		}
 		else {
@@ -148,7 +148,7 @@ open class OAuth2Manager {
 							}
 						case .Failure:
 							// Salesforce doesn't provide an error code or description for GET revoke calls, so we create an error here
-							reject(Error.ResponseError(code: "token_revocation_error", description: "Error revoking token"))
+							reject(SFError.ResponseError(code: "token_revocation_error", description: "Error revoking token"))
 						}
 				}
 			}
@@ -227,7 +227,7 @@ open class OAuth2Manager {
 					}
 					else {
 						// Can't parse the returned string; return as-is
-						reject(Error.ResponseError(code: "unknown", description: URLEncodedString))
+						reject(SFError.ResponseError(code: "unknown", description: URLEncodedString))
 					}
 				case .Failure(let error):
 					reject(error)

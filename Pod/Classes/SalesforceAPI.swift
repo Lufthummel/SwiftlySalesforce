@@ -157,7 +157,7 @@ extension SalesforceAPI {
 		
 		return Promise {
 			fulfill, reject in
-			manager.request(self.endpoint(credentials: credentials, version: version) as! URLRequestConvertible)
+			manager.request(self.endpoint(credentials: credentials, version: version) as URLRequestConvertible)
 			.validateSalesforceResponse()
 			.responseJSON {
 				(response) -> () in
@@ -175,7 +175,7 @@ extension SalesforceAPI {
 	/// - Parameter credentials: Credentials instance with access token, refresh token, etc.
 	/// - Parameter version: Version of the Salesforce REST API.
 	/// - Returns: Complete NSMutableURLRequest which can be used by Alamofire manager instance to make an asynchronous REST API request
-	public func endpoint(credentials: Credentials, version: Float = DefaultVersion) -> NSMutableURLRequest {
+	public func endpoint(credentials: Credentials, version: Float = DefaultVersion) -> URLRequest {
 		
 		let route = self.route 
 		
@@ -192,7 +192,7 @@ extension SalesforceAPI {
 			URL = credentials.instanceURL.appendingPathComponent("/services/data/v\(version)\(route.URI)")
 		}
 		
-		let req = NSMutableURLRequest(url: URL)
+		var req = URLRequest(url: URL)
 		
 		// Method
 		req.httpMethod = route.method.rawValue
@@ -210,7 +210,7 @@ extension SalesforceAPI {
 		switch route.method {
 		case .get:
 			// URL encoded parameters
-			return ParameterEncoding.url.encode(req as! URLRequestConvertible, parameters: route.parameters).0
+			return ParameterEncoding.url.encode(req as URLRequestConvertible, parameters: route.parameters).0
 		default:
 			// JSON encoded parameters
 			if let params = route.parameters {
